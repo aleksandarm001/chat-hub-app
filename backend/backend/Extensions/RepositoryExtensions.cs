@@ -11,7 +11,7 @@ public static class RepositoryExtensions
     {
         // Repositories
         services.AddScoped<IMessageRepository, RedisMessageRepository>();
-        
+        services.AddScoped<IUserRepository, UserRepository>();
         return services;
 
     }
