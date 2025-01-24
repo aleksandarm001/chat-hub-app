@@ -9,7 +9,9 @@ public static class ServiceExtensions
     {
         // Services
         services.AddScoped<IMessageService, MessageService>();
-        
+        services.AddScoped<ITokenGenerator, TokenGenerator>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IUserService, UserService>();
         //SignalR Hubs or other services (if needed, add here)
         return services;
 
