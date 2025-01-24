@@ -18,11 +18,10 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(configuration);
 });
 
-// configuring PostreSql
+// configuring Posgresql
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"));
-});
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"))
+);
 
 // Adding services
 builder.Services.AddServices();
