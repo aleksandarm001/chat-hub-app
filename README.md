@@ -12,16 +12,17 @@ This is a real-time messaging application that allows users to communicate throu
 
 ## Tech Stack
 
-Backend
-	•	ASP.NET Core SignalR: Handles real-time communication between users.
+#### Backend
+	- ASP.NET Core SignalR: Handles real-time communication between users.
 
-Frontend
-	•	Angular: Provides a dynamic and interactive user interface.
+#### Frontend
+	- Angular: Provides a dynamic and interactive user interface.
 
-Database
-	•	Redis: Used for storing messages in memory for fast retrieval and scalability.
+#### Database
+	- Redis: Used for storing messages in memory for fast retrieval and scalability.
+ 	- PostgreSQL: Used to securely store information about Users including passwords, usernames, and other account details, ensuring data consistency and reliability.
 
 
-Contact
-	•	Email: aleksandar.marinkovic6366@gmail.com
-	•	GitHub: aleksandarm001
+#### Contact
+	• Email: aleksandar.marinkovic6366@gmail.com
+	• GitHub: aleksandarm001
