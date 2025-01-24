@@ -258,3 +258,12 @@
 /Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/obj/Debug/net8.0/backend.pdb
 /Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/obj/Debug/net8.0/backend.genruntimeconfig.cache
 /Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/obj/Debug/net8.0/ref/backend.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.Extensions.Logging.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Npgsql.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/aleksandar2109/Documents/Programming/chat-hub-app/backend/backend/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Design.dll
