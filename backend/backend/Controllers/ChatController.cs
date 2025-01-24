@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
-    [Route("api/chat")]
     [ApiController]
+    [Route("api/chat")]
     public class ChatController : ControllerBase
     {
         private readonly IMessageService _messageService;
