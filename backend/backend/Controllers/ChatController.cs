@@ -14,14 +14,6 @@ namespace backend.Controllers
         {
             _messageService = messageService;
         }
-
-        [HttpGet("messages")]
-        public async Task<IActionResult> GetMessages()
-        {
-            var messages = await _messageService.GetMessages();
-            return Ok(messages);
-        }
-        
         
     }
 }

@@ -68,5 +68,18 @@ public class UserService : IUserService
             throw;
         }
     }
+
+    public async Task<IEnumerable<User>> GetUsers()
+    {
+        try
+        {
+            return await _userRepository.GetUsers();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetUsersAsync: {ex.Message}");
+            throw;
+        }
+    }
 }
     

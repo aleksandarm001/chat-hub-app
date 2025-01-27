@@ -1,4 +1,5 @@
 using backend.Interfaces.Services;
+using backend.Models;
 using backend.Models.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,27 @@ namespace backend.Controllers
             }
         }
         
+        [HttpGet("get-users")]
+        public async Task<ActionResult<User>> GetUsers()
+        {
+            
+            try
+            {
+                var users = await _userService.GetUsers();
+                
+                var response = new
+                {
+                    Message = "Users fetched successfully",
+                    Data = users
+                };
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in AddUser: {e.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error.");
+            }
+        }
         
     }
 }
