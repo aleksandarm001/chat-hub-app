@@ -1,0 +1,21 @@
+<div class="login-background">
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+      <div>
+        <label>Email</label>
+        <input formControlName="username" type="text" />
+        <label>Password</label>
+        <input formControlName="password" type="password" />
+        <button class="btn-login" type="submit">
+          <span *ngIf="!isDisabled">Login</span>
+        </button>
+        <p class="moreInfo">
+          Don't have an account yet? <a href="/register" 
+            >Sign Up</a>
+            <br>
+          Forgotten password? <a href="/reset-password" 
+            >Reset it</a>
+        </p>
+      </div>
+    </form>
+    <div toastContainer></div>
+  </div>

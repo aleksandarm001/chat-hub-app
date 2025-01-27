@@ -1,0 +1,17 @@
+<div>
+  <h1>Chat App</h1>
+  <div>
+    <label for="receiver">Send to:</label>
+    <input [(ngModel)]="receiverId" placeholder="Receiver ID" />
+  </div>
+  <div>
+    <label for="message">Message:</label>
+    <input [(ngModel)]="message" placeholder="Your message" />
+    <button (click)="sendMessage()">Send</button>
+  </div>
+
+  <h2>Messages</h2>
+  <div *ngFor="let msg of messages">
+    <strong>{{ msg.senderId }}:</strong> {{ msg.text }}
+  </div>
+</div>
