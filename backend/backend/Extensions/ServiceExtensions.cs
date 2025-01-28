@@ -1,4 +1,6 @@
+using backend.Hubs;
 using backend.Interfaces.Services;
+using backend.Models;
 using backend.Services;
 
 namespace backend.Extensions;

@@ -1,0 +1,33 @@
+<div class="chat-container">
+  <!-- Lista korisnika -->
+  <div class="user-list">
+    <div
+      class="user-item"
+      *ngFor="let user of users"
+      [class.active]="user.username === activeUserUsername"
+      (click)="onUserClick(user.username)"
+    >
+      {{ user.username }}
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-box" *ngIf="activeUserUsername">
+    <div class="messages">
+      <div
+        *ngFor="let message of messages"
+        [class.self]="message.senderId === currentUserId"
+      >
+        <span>{{ message.content }}</span>
+      </div>
+    </div>
+    <div class="input-box">
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        placeholder="Type a message"
+      />
+      <button (click)="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>

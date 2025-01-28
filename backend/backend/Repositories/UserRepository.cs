@@ -68,4 +68,17 @@ public class UserRepository : IUserRepository
             throw;
         }
     }
+
+    public async Task<IEnumerable<User>> GetUsers()
+    {
+        try
+        {
+            return await _users.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetUsers: {ex.Message}");
+            throw;
+        }
+    }
 }
