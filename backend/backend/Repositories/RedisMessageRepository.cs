@@ -42,13 +42,13 @@ public class RedisMessageRepository : IMessageRepository
         try
         {
             var chatKey = GetChatKey(userId1, userId2);
-            var messagesKey = await _database.HashGetAsync(chatKey, "Messages");
+            //var messagesKey = await _database.HashGetAsync(chatKey, "Messages");
 
-            if (messagesKey.IsNullOrEmpty)
-            {
-                throw new Exception("Chat not found or messages key missing.");
-            }
-
+            //if (messagesKey.IsNullOrEmpty)
+            //{
+            //    throw new Exception("Chat not found or messages key missing.");
+            //}
+            var messagesKey = $"{GetChatKey(userId1, userId2)}:messages";
             var message = new Message(userId1, userId2, content);
             var messageJson = JsonConvert.SerializeObject(message);
             await _database.SortedSetAddAsync(messagesKey.ToString(), messageJson, message.Timestamp.ToOADate());

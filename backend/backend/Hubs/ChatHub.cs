@@ -5,24 +5,42 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Hubs;
 
+
 public class ChatHub : Hub
 {
     private static readonly ConcurrentDictionary<string, string> _userConnections = new();
-    public async Task SendPrivateMessage(string senderId, string receiverId, string message)
+    private static readonly ConcurrentDictionary<string, List<Message>> _pendingMessages = new(); 
+    private readonly IMessageService _messageService;
+
+    public ChatHub(IMessageService messageService)
     {
-        if (_userConnections.TryGetValue(receiverId, out var receiverConnectionId))
+        _messageService = messageService;
+    }
+    public async Task SendPrivateMessage(long senderId, long recipientId, string messageContent)
+    {
+        var message = new Message(senderId, recipientId, messageContent);
+        
+        await _messageService.SendMessage(senderId, recipientId, messageContent);
+
+        if (_userConnections.TryGetValue(recipientId.ToString(), out var recipientConnectionId))
         {
-            await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderId, message);
+            await Clients.Client(recipientConnectionId).SendAsync("ReceiveMessage", senderId, message.Content);
         }
         else
         {
-            await Clients.Caller.SendAsync("UserNotAvailable", receiverId);
+            if (!_pendingMessages.ContainsKey(recipientId.ToString()))
+            {
+                _pendingMessages[recipientId.ToString()] = new List<Message>();
+            }
+            _pendingMessages[recipientId.ToString()].Add(message);
+
+            await Clients.Caller.SendAsync("UserNotAvailable", recipientId);
         }
     }
-    
-    public async Task StartChat(string userId, string targetUserId)
+
+    public async Task StartChat(long userId, long targetUserId)
     {
-        if (_userConnections.TryGetValue(targetUserId, out var targetConnectionId))
+        if (_userConnections.TryGetValue(targetUserId.ToString(), out var targetConnectionId))
         {
             await Clients.Client(targetConnectionId).SendAsync("ChatStarted", userId, targetUserId);
             await Clients.Caller.SendAsync("ChatStarted", userId, targetUserId);
@@ -32,11 +50,22 @@ public class ChatHub : Hub
             await Clients.Caller.SendAsync("UserNotAvailable", targetUserId);
         }
     }
-    public async Task RegisterUser(string userId)
+
+    public async Task RegisterUser(long userId)
     {
-        _userConnections[userId] = Context.ConnectionId;
+        _userConnections[userId.ToString()] = Context.ConnectionId;
 
         await Clients.Caller.SendAsync("UserRegistered", userId);
+
+        if (_pendingMessages.ContainsKey(userId.ToString()))
+        {
+            var pendingMessages = _pendingMessages[userId.ToString()];
+            foreach (var message in pendingMessages)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", message.SenderId, message.Content);
+            }
+            _pendingMessages.TryRemove(userId.ToString(), out _);
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -49,102 +78,4 @@ public class ChatHub : Hub
 
         await base.OnDisconnectedAsync(exception);
     }
-    
-    
-    /*
-    private static readonly Dictionary<string, string> _connectedUsers = new();
-    private readonly IMessageService _messageService;
-
-    public ChatHub(IMessageService messageService)
-    {
-        _messageService = messageService;
-    }
-    public override async Task OnConnectedAsync()
-    {
-        try
-        {
-            // Retrieve user ID from query string
-            var userId = Context.GetHttpContext()?.Request.Query["userId"].ToString();
-        
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentException("User ID is required to connect.");
-            }
-
-            // Add the user to the connected users dictionary
-            _connectedUsers[userId] = Context.ConnectionId;
-
-            Console.WriteLine($"User {userId} connected with Connection ID {Context.ConnectionId}");
-
-            // Notify others about the user's status
-            await SendUserStatus(userId, true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in OnConnectedAsync: {ex.Message}");
-        }
-    }
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        try
-        {
-            // Find the user by connection ID
-            var user = _connectedUsers.FirstOrDefault(x => x.Value == Context.ConnectionId);
-
-            if (!string.IsNullOrEmpty(user.Key))
-            {
-                _connectedUsers.Remove(user.Key);
-
-                Console.WriteLine($"User {user.Key} disconnected");
-
-                // Notify others about the user's status
-                await SendUserStatus(user.Key, false);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in OnDisconnectedAsync: {ex.Message}");
-        }
-    }
-    public async Task SendPrivateMessage(string senderId, string receiverId, string message)
-    {
-        try
-        {
-            long senderIdLong = long.Parse(senderId);
-            long receiverIdLong = long.Parse(receiverId);
-
-            await _messageService.SendMessage(senderIdLong, receiverIdLong, message);
-
-            if (_connectedUsers.TryGetValue(receiverId, out var connectionId))
-            {
-                await Clients.Client(connectionId).SendAsync("ReceivePrivateMessage", senderId, message);
-            }
-            else
-            {
-                throw new KeyNotFoundException("Receiver not connected.");
-            }
-
-            await Clients.Caller.SendAsync("MessageSent", receiverId);
-        }
-        catch (FormatException ex)
-        {
-            await Clients.Caller.SendAsync("Error", "Invalid user ID format.");
-            Console.WriteLine($"Format error: {ex.Message}");
-        }
-        catch (KeyNotFoundException ex)
-        {
-            await Clients.Caller.SendAsync("Error", "Receiver not connected.");
-            Console.WriteLine($"Receiver not found: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            await Clients.Caller.SendAsync("Error", "Failed to send message.");
-            Console.WriteLine($"Error in SendPrivateMessage: {ex.Message}");
-        }
-    }
-    public async Task SendUserStatus(string user, bool isOnline)
-    {
-        await Clients.All.SendAsync("ReceiveUserStatus", user, isOnline);
-    }
-    */
 }
