@@ -13,53 +13,50 @@ import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 export class Chat2Component implements OnInit {
   messages: Message[] = [];
   users: User[] = [];
-  activeUserUsername: string | null = null;
-  currentUserId = ''; 
+  activeUserId: number | null = null;
+  currentUserId: number = 0;
   newMessage = '';
 
   constructor(private chatService: ChatService,
     private userService: UsersService,
-    private authService : AuthService) {}
+    private authService: AuthService) {}
 
   async ngOnInit() {
-    
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.users = users;
-      },
-      error: (err) => {
-        console.error('Error fetching users:', err);
-      },
-    });
-
     this.authService.user$.subscribe({
       next: (user) => {
-        this.currentUserId = user.username;
+        this.currentUserId = user.id;
         console.log("current user id: ", this.currentUserId);
+
+        this.userService.getUsers().subscribe({
+          next: (users) => {
+            this.users = users.filter(user => user.id !== this.currentUserId);
+          },
+          error: (err) => {
+            console.error('Error fetching users:', err);
+          },
+        });
       },
       error: (err) => {
-        console.error('Error');
+        console.error('Error fetching user data:', err);
       }
-    })
+    });
 
-    
     await this.chatService.connect();
-
-
     await this.chatService.registerUser(this.currentUserId);
 
-    this.chatService.addMessageListener((senderId, message) => {
+    this.chatService.addMessageListener((senderId, messageContent) => {
       const receivedMessage: Message = {
         senderId,
         receiverId: this.currentUserId,
-        content: message,
+        content: messageContent,
         timestamp: new Date(),
       };
       this.messages.push(receivedMessage);
+      console.log(receivedMessage);
     });
 
     this.chatService.addUserNotAvailableListener((receiverId) => {
-      alert(`User with ID ${receiverId} is not available.`);
+      //alert(`User with ID ${receiverId} is not available.`);
     });
 
     this.chatService.addChatStartedListener((userId, targetUserId) => {
@@ -69,35 +66,47 @@ export class Chat2Component implements OnInit {
     });
   }
 
-  onUserClick(targetUserId: string): void {
-    this.activeUserUsername = targetUserId;
-    this.chatService.startChat(this.currentUserId, targetUserId);
-    this.loadMessages(targetUserId);
+  onUserClick(targetUserId: number): void {
+    this.activeUserId = targetUserId;
+        console.log(this.activeUserId, " ", this.currentUserId);
+    this.chatService.getMessages(this.currentUserId, targetUserId).subscribe({
+      next: (messages) => {
+        this.messages = messages; 
+        this.chatService.startChat(this.currentUserId, targetUserId);
+        console.log(this.messages);
+      },
+      error: (err) => {
+        console.error('Error fetching messages:', err);
+      },
+    });
   }
 
-  setActiveUser(userId: string) {
-    this.activeUserUsername = userId;
-    this.loadMessages(userId);
+  setActiveUser(userId: number) {
+    this.activeUserId = userId;
   }
 
-  loadMessages(userId: string) {
-    this.messages = []; 
+  fetchMessages(currentUserId: number, targetUserId: number) {
+    this.chatService.getMessages(currentUserId, targetUserId).subscribe({
+      next: (messages) => {
+        this.messages = [...this.messages, ...messages]; 
+      },
+      error: (err) => {
+        console.error('Error fetching messages:', err);
+      },
+    });
   }
+
 
   async sendMessage() {
-    if (this.activeUserUsername && this.newMessage.trim()) {
+    if (this.activeUserId && this.newMessage.trim()) {
       const message: Message = {
         senderId: this.currentUserId,
-        receiverId: this.activeUserUsername,
+        receiverId: this.activeUserId,
         content: this.newMessage,
         timestamp: new Date(),
       };
 
-      await this.chatService.sendMessage(
-        this.activeUserUsername,
-        this.currentUserId,
-        this.newMessage
-      );
+      await this.chatService.sendMessage(this.activeUserId, this.currentUserId, this.newMessage);
 
       this.messages.push(message);
       this.newMessage = '';

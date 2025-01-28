@@ -1,5 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { Message } from '../features/chat-2/message';
+import { map, Observable, pipe } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -7,13 +10,12 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 export class ChatService {
   private readonly hubConnection: HubConnection;
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl('http://localhost:5162/chathub')
       .build();
   }
 
-  // Connect to the SignalR hub
   async connect(): Promise<void> {
     try {
       await this.hubConnection.start();
@@ -23,8 +25,7 @@ export class ChatService {
     }
   }
 
-  // Start a chat session between two users
-  async startChat(userId: string, targetUserId: string): Promise<void> {
+  async startChat(userId: number, targetUserId: number): Promise<void> {
     try {
       await this.hubConnection.invoke('StartChat', userId, targetUserId);
     } catch (error) {
@@ -32,13 +33,11 @@ export class ChatService {
     }
   }
 
-  // Listen for "ChatStarted" events
-  addChatStartedListener(callback: (userId: string, targetUserId: string) => void): void {
+  addChatStartedListener(callback: (userId: number, targetUserId: number) => void): void {
     this.hubConnection.on('ChatStarted', callback);
   }
 
-  // Register the user with their userId
-  async registerUser(userId: string): Promise<void> {
+  async registerUser(userId: number): Promise<void> {
     try {
       await this.hubConnection.invoke('RegisterUser', userId);
     } catch (error) {
@@ -46,8 +45,7 @@ export class ChatService {
     }
   }
 
-  // Send a private message to a specific user
-  async sendMessage(receiverId: string, senderId: string, message: string): Promise<void> {
+  async sendMessage(receiverId: number, senderId: number, message: string): Promise<void> {
     try {
       await this.hubConnection.invoke('SendPrivateMessage', senderId, receiverId, message);
     } catch (error) {
@@ -55,13 +53,17 @@ export class ChatService {
     }
   }
 
-  // Listen for incoming messages
-  addMessageListener(callback: (senderId: string, message: string) => void): void {
+  addMessageListener(callback: (senderId: number, message: string) => void): void {
     this.hubConnection.on('ReceiveMessage', callback);
   }
 
-  // Listen for user not available responses
-  addUserNotAvailableListener(callback: (receiverId: string) => void): void {
+  addUserNotAvailableListener(callback: (receiverId: number) => void): void {
     this.hubConnection.on('UserNotAvailable', callback);
+  }
+
+  getMessages(currentUserId: number, targetUserId: number): Observable<Message[]> {
+    return this.http.get<any>(`http://localhost:5162/api/chat/get-messages/${currentUserId}/${targetUserId}`).pipe(
+      map(response => response.data) 
+    );
   }
 }

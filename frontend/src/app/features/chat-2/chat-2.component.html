@@ -1,26 +1,30 @@
 <div class="chat-container">
-  <!-- Lista korisnika -->
   <div class="user-list">
     <div
       class="user-item"
       *ngFor="let user of users"
-      [class.active]="user.username === activeUserUsername"
-      (click)="onUserClick(user.username)"
-    >
+      [class.active]="user.id === activeUserId"
+      (click)="onUserClick(user.id!)">
       {{ user.username }}
     </div>
   </div>
 
-  <!-- Chat -->
-  <div class="chat-box" *ngIf="activeUserUsername">
+  <div class="chat-box" *ngIf="activeUserId">
     <div class="messages">
       <div
         *ngFor="let message of messages"
         [class.self]="message.senderId === currentUserId"
+        class="message"
       >
-        <span>{{ message.content }}</span>
+        <div class="message-bubble">
+          <span class="message-content">{{ message.content }}</span>
+          <div class="message-meta">
+            <span class="message-time">{{ message.timestamp | date: 'shortTime' }}</span>
+          </div>
+        </div>
       </div>
     </div>
+
     <div class="input-box">
       <input
         type="text"
