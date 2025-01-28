@@ -9,7 +9,7 @@
 ## 🎯 **Features**
 
 - **🔒 Private Chat**: Engage in secure, one-on-one real-time conversations.  
-- **🚀 Real-Time Messaging**: Enjoy fast and responsive messaging with low latency.  
+- **🚀 Real-Time Messaging**: Fast and responsive messaging with low latency.  
 
 ---
 
@@ -19,7 +19,7 @@
 - **ASP.NET Core SignalR**: Powers the real-time communication engine, ensuring low-latency, bidirectional data exchange for seamless messaging.
 
 ### **Frontend**
-- **Angular**: Provides a dynamic and interactive user interface with a responsive design for both desktop and mobile devices.
+- **Angular**: Provides a dynamic and interactive user interface.
 
 ### **Database**
 - **Redis**: Ensures fast message retrieval and scalability by storing chat messages in memory.  
